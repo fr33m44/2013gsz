@@ -1,0 +1,109 @@
+/* Ê×Ò³  */
+*{
+	margin:0px;
+	border:0px;
+}
+textarea,input,button{
+	border:1px solid #C83322;
+}
+fieldset{
+	border:1px solid #eee;
+}
+a{
+	text-decoration:none;
+	color:#C83322;
+}
+a:hover{
+	text-decoration:underline;
+} 
+#wrapper{
+	width:936px; 
+	margin:20px auto;
+}
+#header{
+	width:936px;
+	height:60px;
+}
+#header #logo{
+	width:200px;
+	height:60px;
+	float:left;
+}
+#search-bar{
+	float:left;
+	margin-left:16px;
+	margin-top:18px;
+}
+#account-binding{
+	float:left;
+	margin-left:44px;
+	margin-top:20px;
+}
+#status{
+	width:936px;
+}
+#status-list{
+	list-style-type:none;
+}
+/*
+#sidebar{
+	float:left;
+	width:200px;
+	height:1500px;
+	background:#999;
+}
+#sidebar img{
+	margin:30px;	
+}
+*/
+#stat{
+	list-style-type:disc;
+	line-height:40px;
+}
+#footer{
+	clear:left;
+	width:936px;
+	height:200px;
+	text-align:center;
+	margin-top:20px;
+	color:#a5a5a5;
+}
+#footer a{
+	color:#a5a5a5;
+}
+#postform{
+	margin-top:20px;
+	font-size:20px;
+	width:548px;
+}
+#btnPost{
+	margin-left:474px;
+	margin-top:20px;
+	width:100px;
+	height:40px;
+}
+#page-nav{
+	text-align:center;
+	margin-top:10px;
+}
+.item{
+	position:relative;
+	line-height:40px;
+	margin-bottom:20px;
+	padding-bottom:5px;
+	background:url("/images/border.gif") repeat-x scroll 0 bottom transparent;
+}
+.avatar{
+	position:absolute;
+	top:10px;
+}
+.info , .content{ 
+	padding-left:50px;
+	max-width:936px;
+}
+/* µ¥Ò³  */
+#status-page{
+}
+#status-detail{
+	margin-top:50px;
+}
