@@ -31,8 +31,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link href="css/base.css" rel="stylesheet" />
-<script language="javascript" type="text/javascript" src="js/jquery.js"></script>
+<link href="static/base.css" rel="stylesheet" />
+<script language="javascript" type="text/javascript" src="static/jquery.js"></script>
 <script>
 	$(document).ready(function(){
 		//初始化

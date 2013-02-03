@@ -1,0 +1,97 @@
+/* Ê×Ò³  */
+*{
+	margin:0px;
+	border:0px;
+}
+textarea,input,button{
+	border:1px solid #C83322;
+}
+fieldset{
+	border:1px solid #eee;
+}
+a{
+	text-decoration:none;
+	color:#C83322;
+}
+a:hover{
+	text-decoration:underline;
+}
+ol{
+	padding:0px;
+}
+#wrapper{
+	width:480px; 
+	margin:20px auto;
+}
+#status{
+	width:480px;
+}
+#status-list{
+	list-style-type:none;
+}
+#panel{
+	margin-bottom:20px;
+	border:1px solid #eee;
+}
+#panel li{
+	list-style-type:none;
+}
+.item-right{
+	float:right;
+	display:inline;
+}
+#stat{
+	list-style-type:disc;
+	line-height:40px;
+}
+#footer{
+	clear:left;
+	width:480px;
+	height:200px;
+	text-align:center;
+	margin-top:20px;
+	color:#a5a5a5;
+}
+#footer a{
+	color:#a5a5a5;
+}
+#postform{
+	margin-top:20px;
+	font-size:20px;
+	width:548px;
+}
+#btnPost{
+	margin-left:474px;
+	margin-top:20px;
+	width:100px;
+	height:40px;
+}
+#page-nav{
+	text-align:center;
+	margin-top:10px;
+}
+.item{
+	position:relative;
+	line-height:20px;
+	margin-bottom:5px;
+	padding-bottom:5px;
+	background:url("/images/border.gif") repeat-x scroll 0 bottom transparent;
+}
+.avatar{
+	position:absolute;
+	top:10px;
+}
+.info , .content{ 
+	max-width:480px;
+}
+/* µ¥Ò³  */
+#status-page{
+}
+#status-detail{
+	margin-top:50px;
+}
+
+#loginform{
+	text-align:center;
+	
+}

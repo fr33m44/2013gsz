@@ -1,6 +1,12 @@
 ﻿<?php 
 	//连接数据库
 	require_once 'conn.php';
+	//start session
+	session_start();
+	if($_SESSION['userid'] == "")
+		header('location:login.php');
+	
+	
 	//分页
  	isset($_GET['page'])?$page=$_GET['page']:$page=1;
  	//搜索
@@ -10,12 +16,12 @@
     if(is_numeric($page))
     {
     	$page_size=10;
-    	isset($_GET['s'])?$query="select count(*) as total from status where  post_type = 'post' and post_status = 'publish' and post_content like '%".$s."%'":$query="select count(*) as total from status where  post_type = 'post' and post_status = 'publish' ";
+    	isset($_GET['s'])?$query="select count(*) as total from diary where content like '%".$s."%'":$query="select count(*) as total from diary ";
     	$result_p=mysql_query($query);
     	$status_count=mysql_result($result_p,0,"total");
     	$page_count=ceil($status_count/$page_size);
     	$offset=($page-1)*$page_size;
-    	isset($_GET['s'])?$sql=mysql_query("select * from status where post_type = 'post' and post_status = 'publish' and post_content like '%".$s."%' order by post_date desc limit $offset,$page_size"):$sql=mysql_query("select * from status where post_type = 'post' and post_status = 'publish'  order by post_date desc limit $offset,$page_size");
+    	isset($_GET['s'])?$sql=mysql_query("select * from diary where content like '%".$s."%' order by title desc limit $offset,$page_size"):$sql=mysql_query("select * from diary order by title desc limit $offset,$page_size");
     	$sql_user=mysql_query("select * from user");
     	$row_user=mysql_fetch_assoc($sql_user);
 ?>
@@ -23,46 +29,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link href="css/base.css" rel="stylesheet" />
-<link href="css/jquery.lightbox-0.5.css" rel="stylesheet" />
-<script language="javascript" type="text/javascript" src="js/jquery.js"></script>
-<script language="javascript" type="text/javascript" src="js/jquery.lightbox-0.5.js"></script>
+<link href="static/base.css" rel="stylesheet" />
+<link href="static/jquery.lightbox-0.5.css" rel="stylesheet" />
+<script language="javascript" type="text/javascript" src="static/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="static/jquery.lightbox-0.5.js"></script>
 <script language="javascript" type="text/javascript">
 	$(function(){
 		$('a.lightbox').lightBox();
-		/*
+		
 		$(".item").mouseover(function(){
 			$(this).css("background","#eee");
 			});
 		$(".item").mouseout(function(){
 			$(this).css("background","#fff");
 			});
-		*/
+		
 	});
 </script>
-<title>干啥子</title>
+<title>干啥子日记[ganshazi diary]</title>
 </head>
 
 <body>
 <div id="wrapper">
-	<div id="header">
-		<div id="logo">
-			<a href="."><img src="images/logo_ganshazi.png"></img></a>
-		</div>
-		<div id="search-bar">
-			<form action="index.php" method="get">
-				<input name="s" type="text" value="输入关键字..." onclick="this.value='';" />
-				<input type="submit" value="搜索" />
-			</form>
-		</div>
-		<div id="account-binding">
-			<a href="accounts.php" title="帐号绑定">帐号绑定</a>
-		</div>
+	<div id="panel">
+		<ol id="menu-list">
+			<li><a href="new.php">写日记</a></li>
+		</ol>
 	</div>
-	<div id="status">
-	<textarea id="postform" rows="3" cols="65"></textarea>
-	
-	<input type="button" id="btnPost" value="发送" />
 	<ol id="status-list">
 	<?php 
 		while (($row = mysql_fetch_array($sql, MYSQL_ASSOC))==true) {
@@ -72,29 +65,21 @@
     				break;
     			}
 	?>
-		<li class="item" id="<?php echo $row['ID']?>">
-			<div class="avatar">
-				<span class="b">
-						<img src="images/tun.jpg" width="48" height="48" title="tun的头像"/>
-					
-				</span>
-			</div>
+		<li class="item" id="<?php echo $row['id']?>">
 			<div class="info">
-				<a href="#" class="username"><?php echo $row_user['screen_name']?></a> 在 
-				<span class="meta">
-					<a class="time-stamp" title="<?php echo $row['post_date']?>" href="detail.php?id=<?php echo $row['ID']?>"><?php echo $row['post_date']?></a> 使用 网页 发布
+				<span class="item-right">
+					<span class="post-time"> <?php echo $row['post_date']; ?></span>
+					<span class="edit"><a href="detail.php?id=<?php echo $row['id']?>&a=edit">编辑</a></span>
+					<span class="delete"><a href="detail.php?id=<?php echo $row['id']?>&a=del">删除</a></span>
 				</span>
-			</div>
-			<div class="content">
-			<?php 
-				echo $row['post_content'];
-				/*
-				if($row['picPath']!="")
-				{
-					echo '<a class="lightbox" href="img/'.str_replace("100x75","640x480",substr($row['picPath'],-43,43)).'"> <img src=img/'.substr($row['picPath'],-43,43).' /></a>';
-				}
-				*/
-			?>
+				<span class="meta">
+					<a class="post-title" title="<?php 
+							echo $row['title'];
+							?>" href="detail.php?id=<?php echo $row['id']?>"><?php 
+							echo $row['title'];
+							?>
+					</a>
+				</span>
 			</div>
 		</li>
 	<?php 
@@ -136,24 +121,6 @@
 		}
 	?>
 	</div>
-	</div>
-	<!--
-	<div id="sidebar">
-		<div id="icon">
-		<img src="images/tun.jpg" title="头像"/>
-		<ul id="stat">
-			<li>帐号 <?php echo $row_user['name']?> </li>
-			<li>所在地 <?php echo $row_user['screen_name']?></li>
-			<li>网站 ??</li>
-			<li>兴趣爱好 ?? </li>
-			<li>个人简介 <?php echo $row_user['description']?></li>
-			<li><?php echo $row_user['followers_count']?> 个我更随的人</li>
-			<li><?php echo $row_user['following_count']?> 个跟随我的人</li>
-			<li><?php echo $row_user['statuses_count']?> 个状态</li>
-		</ul>
-		</div>
-	</div>
-	-->
 	<div id="footer">copyright© 2010  <a href="http://tunps.com">tunpishuang</a>. All rights reserved.</div>
 	<script src="http://s14.cnzz.com/stat.php?id=2250487&web_id=2250487&show=pic" language="JavaScript"></script>
 </div>
