@@ -10,11 +10,12 @@
 	if(isset($_POST['title']))
 	{
 		$title 		= $_POST['title'];
+		$date		= $_POST['date'];
 		$content	= $_POST['content'];
-		mysql_query("insert into diary(title,content,post_date,post_modified) value('$title', '$content', now(), now()) ");
+		$result = mysql_query("insert into diary(title,date,content,post_date,post_modified) value('$title','$date', '$content', now(), now()) ");
+		var_dump($result);
 		echo "<script>保存成功！</script>";
 		header('location:index.php');
-		
 	}
 	
 ?>
@@ -48,7 +49,10 @@
 		
 	<form name="form1" id="form1" action="new.php" method="post">
 	<div id="title">
-			<h1><input type="text" name="title" /></h1>
+			<h2>Title:<input type="text" name="title" size="80" style="padding:3px 8px"/></h2>
+	</div>
+	<div id="date">
+			<h2>Date:<input type="text" name="date" size="80" style="padding:3px 8px"/></h2>
 	</div>
 	<div id="panel">
 		<span class="save"><input type="submit" value="保存" /></span>	
