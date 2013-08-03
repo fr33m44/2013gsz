@@ -12,9 +12,10 @@
 		$a  	= $_POST['a'];
 		if($a == 'edit'){
 			$id 	= $_POST['id'];
+			$title  = $_POST['title'];
 			$date 	= $_POST['date'];
 			$content= $_POST['content'];
-			$result = mysql_query($q = sprintf("update diary set date='%s', content='%s' where id=%s",$date, $content, $id));
+			$result = mysql_query($q = sprintf("update diary set date='%s', title='%s', content='%s' where id=%s",$date, $title, $content, $id));
 			
 			if($result)
 			{
@@ -98,7 +99,7 @@
 <link rel="stylesheet" type="text/css" media="all" href="static/reset.css" />
 <link rel="stylesheet" type="text/css" media="all" href="static/text.css" />
 <link rel="stylesheet" type="text/css" media="all" href="static/960.css" />
-<link rel="stylesheet" type="text/css" media="all" href="static/demo.css" />
+<!--<link rel="stylesheet" type="text/css" media="all" href="static/demo.css" />-->
 <link rel="stylesheet" type="text/css" media="all" href="static/base.css" />
 <link href="static/jquery.lightbox-0.5.css" rel="stylesheet" />
 <script language="javascript" type="text/javascript" src="static/jquery.js"></script>
@@ -210,7 +211,13 @@ $(function(){
 			type:"POST",
 			contentType: "application/x-www-form-urlencoded;charset=utf-8",
 			url:location.href,
-			data:{'a':'edit','id':id,'date':$('input[name="date"]').val(),'content':$('#contentText').html()},
+			data:{	
+					'a':'edit',
+					'id':id,
+					'date':$('input[name="date"]').val(),
+					'title':$('input[name="title"]').val(), 
+					'content':$('#contentText').html()
+				},
 			success: function(msg){
 				alert(msg);
 				location.replace(location.href);
