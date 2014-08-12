@@ -83,11 +83,11 @@
 	*/
 	$yearList = mysql_query("select extract( year from date) as yearlist from diary group by extract( year from date) order by yearlist desc");
 	if($y)
-		$monthList = mysql_query("select extract( month from date) as monthlist from diary where date<'$y-12-31' && date>'$y-0-0' group by extract( month from date) order by monthlist desc");
+		$monthList = mysql_query("select lpad(extract( month from date),2,0) as monthlist from diary where date<'$y-12-31' && date>'$y-0-0' group by extract( month from date) order by monthlist desc");
 	if($y && $m)
-		$dayList = mysql_query("select extract( day from date) as daylist, title from diary where date<'$y-$m-31' && date>'$y-$m-0' group by extract( day from date) order by daylist desc");
+		$dayList = mysql_query("select lpad(extract( day from date),2,0) as daylist, DAYOFWEEK(DATE) AS weeknum, title from diary where date<'$y-$m-31' && date>'$y-$m-0' group by extract( day from date) order by daylist desc");
 	if($y && $m && $d)
-		$content = mysql_query("select * from diary where date='$y-$m-$d'");
+		$content = mysql_query("select *,DAYOFWEEK(DATE) AS weeknum from diary where date='$y-$m-$d'");
 	
 	
 	
@@ -121,11 +121,11 @@
 		
 		<div class="grid_3"><input type="text" id="search_key" placeholder="Search Diary Here..." size="20" /><input type="button" id="link_search" value="Search" /></div>
 		
-		<div class="grid_1"><a class="linkbtn" href="new.php" id="link_new">New Diary</a></div>
+		<div class="grid_1"><a class="linkbtn" href="new.php" id="link_new">New</a></div>
 <?php if($y && $m && $d){?>
-		<div class="grid_1"><a class="linkbtn" href="javascript:;" id="link_edit">Edit Diary</a></div>
+		<div class="grid_1"><a class="linkbtn" href="javascript:;" id="link_edit">Edit</a></div>
 		
-		<div class="grid_1"><a class="linkbtn hide" href="javascript:;" id="link_save">Save Diary</a></div>
+		<div class="grid_1"><a class="linkbtn hide" href="javascript:;" id="link_save">Save</a></div>
 <?php } ?>
 		<div class="clear"></div>
 		<!--list-->
@@ -134,7 +134,10 @@
 			<?php
 				while($yearListArr = mysql_fetch_assoc($yearList))
 				{
-					echo '<li><a href="index.php?y='.$yearListArr['yearlist'].'">'.$yearListArr['yearlist']."年</a></li>\n";
+					if($y == $yearListArr['yearlist'])
+						echo '<li style="font-weight:bold"><a href="index.php?y='.$yearListArr['yearlist'].'">'.$yearListArr['yearlist']."年</a></li>\n";
+					else
+						echo '<li><a href="index.php?y='.$yearListArr['yearlist'].'">'.$yearListArr['yearlist']."年</a></li>\n";
 				}
 			?>
 			</ul>
@@ -146,20 +149,55 @@
 				{
 					while($monthListArr = mysql_fetch_assoc($monthList))
 					{
-						echo '<li><a href="index.php?y='.$y.'&m='.$monthListArr['monthlist'].'">'.$monthListArr['monthlist']."月</a></li>\n";
+						if($m == $monthListArr['monthlist'])
+							echo '<li style="font-weight:bold"><a href="index.php?y='.$y.'&m='.$monthListArr['monthlist'].'">'.$monthListArr['monthlist']."月</a></li>\n";
+						else
+							echo '<li><a href="index.php?y='.$y.'&m='.$monthListArr['monthlist'].'">'.$monthListArr['monthlist']."月</a></li>\n";
 					}
 				}
 			?>
 			</ul>
 		</div>
-		<div class="grid_2" id="day">
+		<div class="grid_3" id="day">
 			<ul class="list">
 			<?php
 				if($y && $m)
 				{
 					while($dayListArr = mysql_fetch_assoc($dayList))
 					{
-						echo sprintf("<li><a href=\"index.php?y=%s&m=%s&d=%s\">%s日 %s</a></li>\n", $y, $m, $dayListArr['daylist'], $dayListArr['daylist'], $dayListArr['title']);
+						$bEmphasizeWeekend = false;
+						
+						if($dayListArr["weeknum"] == 1)
+						{
+							$dayListArr["week_name"] = "日";
+							$bEmphasizeWeekend = true;
+						}
+						elseif($dayListArr["weeknum"] == 2)
+							$dayListArr["week_name"] = "一";
+						elseif($dayListArr["weeknum"] == 3)
+							$dayListArr["week_name"] = "二";
+						elseif($dayListArr["weeknum"] == 4)
+							$dayListArr["week_name"] = "三";
+						elseif($dayListArr["weeknum"] == 5)
+							$dayListArr["week_name"] = "四";
+						elseif($dayListArr["weeknum"] == 6)
+							$dayListArr["week_name"] = "五";
+						elseif($dayListArr["weeknum"] == 7)
+						{
+							$dayListArr["week_name"] = "六";
+							$bEmphasizeWeekend = true;
+						}
+						if($bEmphasizeWeekend)
+							if($d == $dayListArr['daylist'])
+								echo sprintf("<li style=\"font-weight:bold\"><a href=\"index.php?y=%s&m=%s&d=%s\">%s日<span style=\"color:red\">[%s]</span> %s</a></li>\n", $y, $m, $dayListArr['daylist'], $dayListArr['daylist'], $dayListArr['week_name'], $dayListArr['title']);
+							else
+								echo sprintf("<li><a href=\"index.php?y=%s&m=%s&d=%s\">%s日<span style=\"color:red\">[%s]</span> %s</a></li>\n", $y, $m, $dayListArr['daylist'], $dayListArr['daylist'], $dayListArr['week_name'], $dayListArr['title']);
+							
+						else
+							if($d == $dayListArr['daylist'])
+								echo sprintf("<li style=\"font-weight:bold\"><a href=\"index.php?y=%s&m=%s&d=%s\">%s日[%s] %s</a></li>\n", $y, $m, $dayListArr['daylist'], $dayListArr['daylist'], $dayListArr['week_name'], $dayListArr['title']);
+							else
+								echo sprintf("<li><a href=\"index.php?y=%s&m=%s&d=%s\">%s日[%s] %s</a></li>\n", $y, $m, $dayListArr['daylist'], $dayListArr['daylist'], $dayListArr['week_name'], $dayListArr['title']);
 					}
 				}
 			?>
@@ -170,16 +208,20 @@ if($y && $m && $d)
 	{
 		$content = mysql_fetch_assoc($content);
 ?>
-		<div class="grid_8" id="content" name="content">
+		<div class="grid_7" id="content" name="content">
 			<div id="title"><h2 id="titleHead"><?php echo $content['title']?></h2></div>
 			<div id="dates"><em>Date:<span id="date"><?php echo $content['date']?></span> | Post Date:<?php echo $content['post_date']?> | Last Modified:<?php echo $content['post_modified']?></em></div>
 			<div id="contentText"><?php echo $content['content']?></div>
 			<input type="hidden" name="id" value="<?php echo $content['id']?>"/>
 		</div>
+<?php }else {?>
+		<div class="grid_7" id="content" name="content">
+		</div>
 <?php } ?>
+
 		<div class="clear"></div>
 		<!--copyright-->
-		<div class="grid_12" id="footer">copyright© 2010  <a href="http://tunps.com">tunpishuang</a>. All rights reserved.</div>
+		<div class="grid_12" id="footer">copyright© 2010-  <a href="http://tunps.com">tunpishuang</a>. All rights reserved.</div>
 		<div class="clear"></div>
 	</div>
 </div>

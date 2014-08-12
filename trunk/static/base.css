@@ -2,7 +2,7 @@ a{
 	color:#000000;
 }
 a:hover{
-	color:#9fee00;
+	font-weight:bold;
 }
 .list{
 	list-style-type:none;
@@ -16,4 +16,15 @@ a:hover{
 }
 .hide{
 	visibility:hidden;
+}
+#title{
+	padding-top:20px;
+	text-align:center;
+}
+#dates{
+	padding-bottom:10px;
+}
+#dates em{
+	font-style:italic;
+	font-size:0.8em;
 }
