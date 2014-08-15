@@ -33,7 +33,7 @@
 			$page_size = 10;
 			$key = $_POST['key'];
 			$p = $_POST['p'];
-			$query = sprintf("select count(*) as total from diary where title like '%%%s%%' or content like '%%%s%%'", $key, $key);
+			$query = sprintf("select count(1) as total from diary where title like '%%%s%%' or content like '%%%s%%'", $key, $key);
 			//print_r($query);
 			$result_count = mysql_query($query);
 			$count = mysql_result($result_count,0, "total");
@@ -101,11 +101,16 @@
 <link rel="stylesheet" type="text/css" media="all" href="static/960.css" />
 <!--<link rel="stylesheet" type="text/css" media="all" href="static/demo.css" />-->
 <link rel="stylesheet" type="text/css" media="all" href="static/base.css" />
+<link rel="stylesheet" type="text/css" media="all" href="static/pagedown.css" />
 <link href="static/jquery.lightbox-0.5.css" rel="stylesheet" />
 <script language="javascript" type="text/javascript" src="static/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="static/jquery.lightbox-0.5.js"></script>
-<script language="javascript" src="lib/kindeditor/kindeditor.js"></script>
-<script language="javascript" src="lib/kindeditor/lang/zh_CN.js"></script>
+<!--<script language="javascript" src="lib/kindeditor/kindeditor.js"></script>-->
+<!--<script language="javascript" src="lib/kindeditor/lang/zh_CN.js"></script>-->
+<script language="javascript" type="text/javascript" src="static/Markdown.Converter.js"></script>
+<script language="javascript" type="text/javascript" src="static/Markdown.Sanitizer.js"></script>
+<script language="javascript" type="text/javascript" src="static/Markdown.Editor.js"></script>
+
 
 <title>干啥子日记[ganshazi diary]</title>
 </head>
@@ -211,7 +216,12 @@ if($y && $m && $d)
 		<div class="grid_7" id="content" name="content">
 			<div id="title"><h2 id="titleHead"><?php echo $content['title']?></h2></div>
 			<div id="dates"><em>Date:<span id="date"><?php echo $content['date']?></span> | Post Date:<?php echo $content['post_date']?> | Last Modified:<?php echo $content['post_modified']?></em></div>
-			<div id="contentText"><?php echo $content['content']?></div>
+			<!--<div id="contentText"><?php echo $content['content']?></div>-->
+			<div class="wmd-panel">
+            <div id="wmd-button-bar"></div>
+            <textarea class="wmd-input" id="wmd-input"><?php echo $content['content_text']?></textarea>
+        </div>
+        <div id="wmd-preview" class="wmd-panel wmd-preview"></div>
 			<input type="hidden" name="id" value="<?php echo $content['id']?>"/>
 		</div>
 <?php }else {?>
@@ -233,6 +243,7 @@ $(function(){
 	var id=<?php echo $content['id']?>;
 	
 	$('#link_edit').click(function(){
+		/*
 		if(typeof $('input[id="title"]').attr('id') == 'undefined')
 		{
 			$('#link_save').removeClass('hide');
@@ -245,15 +256,32 @@ $(function(){
 			$("#title").html('<h2><input name="title" id="title" type="text" size="80" value="'+title+'"+ style="padding:3px 8px" /></h2>');
 			$("#date").html('<input type="text" name="date" value="'+date+'"/>');
 		}
+		*/
+		if(typeof $('input[id="title"]').attr('id') == 'undefined')
+		{
+			var title = $("#titleHead").html();
+			var date = $("#date").html();
+			$("#title").html('<h2><input name="title" id="title" type="text" size="80" value="'+title+'"+ style="padding:3px 8px" /></h2>');
+			$("#date").html('<input type="text" name="date" value="'+date+'"/>');
+				
+			var converter1 = Markdown.getSanitizingConverter();
+			converter1.hooks.chain("preBlockGamut", function (text, rbg) {
+				return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+					return "<blockquote>" + rbg(inner) + "</blockquote>\n";
+				});
+			});
+			var editor1 = new Markdown.Editor(converter1);
+			editor1.run();
+		}
 	}); 
 	
 	$('#link_save').click(function(){
-		KindEditor.remove('div[id="contentText"]');
+		KindEditor.remove('div[id="wmd-preview"]');
 		$.ajax({
 			type:"POST",
 			contentType: "application/x-www-form-urlencoded;charset=utf-8",
 			url:location.href,
-			data:{	
+			data:{
 					'a':'edit',
 					'id':id,
 					'date':$('input[name="date"]').val(),
