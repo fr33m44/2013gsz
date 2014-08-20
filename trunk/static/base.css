@@ -28,3 +28,10 @@ a:hover{
 	font-style:italic;
 	font-size:0.8em;
 }
+#horizon{
+	margin-top:90px;
+}
+#footer {
+	margin-bottom:50px;
+	text-align:center;
+}
