@@ -100,11 +100,11 @@
 	*/
 	$yearList = mysql_query("select extract( year from date) as yearlist from diary group by extract( year from date) order by yearlist desc");
 	if($y)
-		$monthList = mysql_query("select lpad(extract( month from date),2,0) as monthlist from diary where date<'$y-12-31' && date>'$y-0-0' group by extract( month from date) order by monthlist desc");
+		$monthList = mysql_query("select lpad(extract( month from date),2,0) as monthlist from diary where date <= '$y-12-31' && date >= '$y-0-0' group by extract( month from date) order by monthlist desc");
 	if($y && $m)
-		$dayList = mysql_query("select lpad(extract( day from date),2,0) as daylist, DAYOFWEEK(DATE) AS weeknum, title from diary where date<'$y-$m-31' && date>'$y-$m-0' group by extract( day from date) order by daylist desc");
+		$dayList = mysql_query("select lpad(extract( day from date),2,0) as daylist, DAYOFWEEK(DATE) AS weeknum, title from diary where date <= '$y-$m-31' && date >= '$y-$m-0' group by extract( day from date) order by daylist desc");
 	if($y && $m && $d)
-		$content = mysql_query("select *,DAYOFWEEK(DATE) AS weeknum from diary where date='$y-$m-$d'");
+		$content = mysql_query("select *,DAYOFWEEK(DATE) AS weeknum from diary where date = '$y-$m-$d'");
 	
 	
 	
