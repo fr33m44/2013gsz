@@ -8,8 +8,9 @@
 	{
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		$result = mysql_query("select name,pass from `user` where id=1");
-		$row = mysql_fetch_array($result, MYSQL_ASSOC);
+		$result = $conn->query("select name,pass from `user` where id=1");
+		$row = $result->fetch_array();
+		
 		if($row['name'] == $username && $row['pass'] == md5($password))
 		{
 			$_SESSION['userid'] = 1;
