@@ -18,7 +18,7 @@
 			$date 	= $_POST['date'];
 			$content_text = $_POST['content_text'];
 			$content_html = $_POST['content_html'];
-			$result = mysql_query($q = sprintf("update diary set date='%s', title='%s', content_text='%s', content_html='%s' where id=%s",$date, $title, $content_text, $content_html, $id));
+			$result = $conn->query($q = sprintf("update diary set date='%s', title='%s', content_text='%s', content_html='%s' where id=%s",$date, $title, $content_text, $content_html, $id));
 			
 			if($result)
 			{
@@ -35,7 +35,7 @@
 			$date 	= $_POST['date'];
 			$content_text = $_POST['content_text'];
 			$content_html = $_POST['content_html'];
-			$result = mysql_query($q = sprintf("insert into diary set date='%s', title='%s', content_text='%s', content_html='%s' ",$date, $title, $content_text, $content_html));
+			$result = $conn->query($q = sprintf("insert into diary set date='%s', title='%s', content_text='%s', content_html='%s' ",$date, $title, $content_text, $content_html));
 			
 			if($result)
 			{
@@ -50,17 +50,19 @@
 			$page_size = 10;
 			$key = $_POST['key'];
 			$p = $_POST['p'];
-			$query = sprintf("select count(1) as total from diary where title like '%%%s%%' or content like '%%%s%%'", $key, $key);
-			//print_r($query);
-			$result_count = mysql_query($query);
-			$count = mysql_result($result_count,0, "total");
+			$str = sprintf("select count(1) as total from diary where title like '%%%s%%' or content like '%%%s%%'", $key, $key);
+			var_dump($query);
+			die;
+			$res = $conn->query($str);
+			$count = $res->fetch_array(0, "total");
+			
 			$page_count = ceil($count/$page_size);
 			$offset = ($p-1)*$page_size;
 			//返回搜索结果
-			$query = sprintf("select * from diary where title like '%%%s%%' or content like '%%%s%%' order by date desc limit $offset,$page_size", $key, $key);
-			$result_search = mysql_query($query);
+			$str = sprintf("select * from diary where title like '%%%s%%' or content like '%%%s%%' order by date desc limit $offset,$page_size", $key, $key);
+			$res = $conn->query($str);
 			$i=0;
-			while($row_search = mysql_fetch_assoc($result_search))
+			while($row_search = $res->fetch_assoc($result_search))
 			{
 				$rows_search[$i++] = $row_search;
 			}
@@ -79,32 +81,14 @@
  	isset($_GET['y'])?$y=$_GET['y']:$y=0;
 	isset($_GET['m'])?$m=$_GET['m']:$m=0;
 	isset($_GET['d'])?$d=$_GET['d']:$d=0;
-	//action
-	//isset($_GET['a'])?$d=$_GET['a']:$a=0;// edit del add
- 	//search
- 	//isset($_GET['s'])?$s=$_GET['s']:$s=null;
- 	
-	/*
-    if(is_numeric($page))
-    {
-    	$page_size=10;
-    	isset($_GET['s'])?$query="select count(*) as total from diary where content like '%".$s."%'":$query="select count(*) as total from diary ";
-    	$result_p=mysql_query($query);
-    	$status_count=mysql_result($result_p,0,"total");
-    	$page_count=ceil($status_count/$page_size);
-    	$offset=($page-1)*$page_size;
-    	isset($_GET['s'])?$sql=mysql_query("select * from diary where content like '%".$s."%' order by title desc limit $offset,$page_size"):$sql=mysql_query("select * from diary order by title desc limit $offset,$page_size");
-    	$sql_user=mysql_query("select * from user");
-    	$row_user=mysql_fetch_assoc($sql_user);
-	}
-	*/
-	$yearList = mysql_query("select extract( year from date) as yearlist from diary group by extract( year from date) order by yearlist desc");
+	
+	$yearList = $conn->query("select extract( year from date) as yearlist from diary group by extract( year from date) order by yearlist desc");
 	if($y)
-		$monthList = mysql_query("select lpad(extract( month from date),2,0) as monthlist from diary where date <= '$y-12-31' && date >= '$y-0-0' group by extract( month from date) order by monthlist desc");
+		$monthList = $conn->query("select lpad(extract( month from date),2,0) as monthlist from diary where date <= '$y-12-31' && date >= '$y-0-0' group by extract( month from date) order by monthlist desc");
 	if($y && $m)
-		$dayList = mysql_query("select lpad(extract( day from date),2,0) as daylist, DAYOFWEEK(DATE) AS weeknum, title from diary where date <= '$y-$m-31' && date >= '$y-$m-0' group by extract( day from date) order by daylist desc");
+		$dayList = $conn->query("select lpad(extract( day from date),2,0) as daylist, DAYOFWEEK(DATE) AS weeknum, title from diary where date <= '$y-$m-31' && date >= '$y-$m-0' group by extract( day from date) order by daylist desc");
 	if($y && $m && $d)
-		$content = mysql_query("select *,DAYOFWEEK(DATE) AS weeknum from diary where date = '$y-$m-$d'");
+		$content = $conn->query("select *,DAYOFWEEK(DATE) AS weeknum from diary where date = '$y-$m-$d'");
 	
 	
 	
@@ -157,7 +141,8 @@
 		<div class="grid_1" id="year">
 			<ul class="list">
 			<?php
-				while($yearListArr = mysql_fetch_assoc($yearList))
+				
+				while($yearListArr = $yearList->fetch_assoc())
 				{
 					if($y == $yearListArr['yearlist'])
 						echo '<li style="font-weight:bold"><a href="index.php?y='.$yearListArr['yearlist'].'">'.$yearListArr['yearlist']."年</a></li>\n";
@@ -172,7 +157,7 @@
 			<?php
 				if($y)
 				{
-					while($monthListArr = mysql_fetch_assoc($monthList))
+					while($monthListArr = $monthList->fetch_assoc())
 					{
 						if($m == $monthListArr['monthlist'])
 							echo '<li style="font-weight:bold"><a href="index.php?y='.$y.'&m='.$monthListArr['monthlist'].'">'.$monthListArr['monthlist']."月</a></li>\n";
@@ -188,7 +173,7 @@
 			<?php
 				if($y && $m)
 				{
-					while($dayListArr = mysql_fetch_assoc($dayList))
+					while($dayListArr = $dayList->fetch_assoc())
 					{
 						$bEmphasizeWeekend = false;
 						
@@ -232,7 +217,7 @@
 //show diary content or show new diary editor UI
 if($y && $m && $d)
 	{
-		$content = mysql_fetch_assoc($content);
+		$content = $content->fetch_assoc();
 ?>
 		<div class="grid_7" id="content" name="content">
 			<div id="title"><h2 id="titleHead"><?php echo $content['title']?></h2></div>
